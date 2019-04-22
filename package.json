@@ -1,5 +1,8 @@
 {
   "name": "bitcoin-rpc-perf",
   "version": "0.0.0",
-  "main": "index.js"
+  "main": "index.js",
+  "dependencies": {
+    "yargs": "^13.2.2"
+  }
 }
