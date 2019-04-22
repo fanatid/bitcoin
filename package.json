@@ -1,0 +1,5 @@
+{
+  "name": "bitcoin-rpc-perf",
+  "version": "0.0.0",
+  "main": "index.js"
+}
