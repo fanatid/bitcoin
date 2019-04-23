@@ -49,12 +49,18 @@ function createMakeRequest (bitcoindURL) {
   if (!auth && (urlOpts.username || urlOpts.password)) auth = `${urlOpts.username}:${urlOpts.password}`
   if (auth) options.headers.Authorization = 'Basic ' + Buffer.from(auth).toString('base64')
 
-  return (method, params = []) => {
+  return (method, params = [], parse = true) => {
     return new Promise((resolve, reject) => {
       const req = new http.ClientRequest(options)
       req.on('error', reject)
       req.on('response', (resp) => {
         if (resp.statusCode !== 200) return reject(new Error(`"${resp.statusMessage}" is not OK.`))
+
+        if (!parse) {
+          resp.on('data', () => {})
+          resp.on('end', () => resolve())
+          return
+        }
 
         const chunks = []
         resp.on('data', (chunk) => chunks.push(chunk))
@@ -86,12 +92,12 @@ function diffTime (time) {
   const makeRequest = createMakeRequest(args.bitcoind)
 
   let state = {}
-  const resetState = () => { state = { blks: 0, txs: 0, ts: diffTime() } }
+  const resetState = () => { state = { req: 0, ts: diffTime() } }
   resetState()
 
   setInterval(() => {
     const ts = diffTime(state.ts)
-    console.log(`${(state.blks / ts).toFixed(2)} blk/s, ${(state.txs / ts).toFixed(2)} tx/s`)
+    console.log(`${(state.req / ts).toFixed(2)} req/s`)
     resetState()
   }, 1000)
 
@@ -100,14 +106,17 @@ function diffTime (time) {
     while (true) {
       const txid = txs.pop()
       if (txid) {
-        await makeRequest('getrawtransaction', [txid, true])
-        state.txs += 1
+        await makeRequest('getrawtransaction', [txid, true], false)
+        state.req += 1
       } else {
         const blockhash = await makeRequest('getblockhash', [args.from++])
-        const block = await makeRequest('getblock', [blockhash, args.fullBlock ? 2 : 1])
-        if (args.fullBlock) state.txs += block.tx.length
-        else txs.push(...block.tx)
-        state.blks += 1
+        if (args.fullBlock) {
+          const block = await makeRequest('getblock', [blockhash, 2], false)
+        } else {
+          const block = await makeRequest('getblock', [blockhash, 1])
+          txs.push(...block.tx)
+        }
+        state.req += 1
       }
     }
   }))
