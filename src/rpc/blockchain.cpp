@@ -655,18 +655,7 @@ static UniValue getmempoolentry(const JSONRPCRequest& request)
 static UniValue removemempoolentry(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1) {
-        throw std::runtime_error(
-            RPCHelpMan{"removemempoolentry",
-               "\nRemove mempool data for given transaction\n",
-               {
-                       {"txid", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The transaction id (must be in mempool)"},
-               },
-               RPCResults{},
-               RPCExamples{
-                       HelpExampleCli("removemempoolentry", "\"mytxid\"")
-                       + HelpExampleRpc("removemempoolentry", "\"mytxid\"")
-               },
-            }.ToString());
+        throw std::runtime_error("removemempoolentry");
     }
 
     uint256 hash = ParseHashV(request.params[0], "txid");
