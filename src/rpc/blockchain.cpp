@@ -827,7 +827,7 @@ static UniValue getblock(const JSONRPCRequest& request)
             + HelpExampleRpc("getblock", "\"00000000c937983704a73af28acdec37b049d214adbda81d7e2a3dd146f6ed09\"")
         );
 
-    LOCK(cs_main);
+    // LOCK(cs_main);
 
     std::string strHash = request.params[0].get_str();
     uint256 hash(uint256S(strHash));
@@ -840,12 +840,18 @@ static UniValue getblock(const JSONRPCRequest& request)
             verbosity = request.params[1].get_bool() ? 1 : 0;
     }
 
+ENTER_CRITICAL_SECTION(cs_main);
     const CBlockIndex* pblockindex = LookupBlockIndex(hash);
     if (!pblockindex) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
     }
 
+auto t1 = std::chrono::high_resolution_clock::now();
     const CBlock block = GetBlockChecked(pblockindex);
+auto t2 = std::chrono::high_resolution_clock::now();
+auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+std::cout << "GetBlockChecked " << pblockindex->nHeight << ": " << duration << std::endl;
+LEAVE_CRITICAL_SECTION(cs_main);
 
     if (verbosity <= 0)
     {
@@ -855,7 +861,12 @@ static UniValue getblock(const JSONRPCRequest& request)
         return strHex;
     }
 
-    return blockToJSON(block, pblockindex, verbosity >= 2);
+auto t21 = std::chrono::high_resolution_clock::now();
+    auto ret = blockToJSON(block, pblockindex, verbosity >= 2);
+auto t22 = std::chrono::high_resolution_clock::now();
+auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>(t22 - t21).count();
+std::cout << "blockToJSON " << pblockindex->nHeight << ": " << duration2 << std::endl;
+    return ret;
 }
 
 struct CCoinsStats
