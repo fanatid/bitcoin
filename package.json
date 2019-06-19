@@ -2,7 +2,11 @@
   "name": "bitcoin-rpc-perf",
   "version": "0.0.0",
   "main": "index.js",
+  "scripts": {
+    "lint": "standard"
+  },
   "dependencies": {
+    "standard": "^12.0.1",
     "yargs": "^13.2.2"
   }
 }

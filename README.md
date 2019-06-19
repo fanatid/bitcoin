@@ -2,17 +2,18 @@
 
 Script:
 
-  - ask about block (with tx hashes)
-  - ask about every tx in block
+  - ask about full block
 
 ### How to use?
 
 ```bash
-node index.js --bitcoind http://bitcoinrpc:password@127.0.0.1:8332 --concurrency 10 --from 500000 --full-block true
+node index.js --bitcoind http://bitcoinrpc:password@127.0.0.1:8332 --concurrency 10 --from 509359 --loop --method rest
 ```
 
 Options:
 
+  - `bitcoind` -- url to bitcoind with user:pass
   - `concurrency` -- number of requests at one time
   - `from` -- number of block from with we start
-  - `full-block` -- ask about block with txs in JSON
+  - `method` -- rest or rpc
+  - `loop` -- request same block by hash over and over
