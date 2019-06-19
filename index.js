@@ -101,7 +101,8 @@ function createRPCRequest (bitcoindURL) {
   return async (height) => {
     let blockhash = height
     if (typeof blockhash === 'number') {
-      blockhash = await makeHTTPRequest(options, JSON.stringify({ id: 0, method: 'getblockhash', params: [height] }), { parse: true })
+      const ret = await makeHTTPRequest(options, JSON.stringify({ id: 0, method: 'getblockhash', params: [height] }), { parse: true })
+      blockhash = ret.result
     }
 
     await makeHTTPRequest(options, JSON.stringify({ id: 0, method: 'getblock', params: [blockhash, 2] }), { parse: false })
