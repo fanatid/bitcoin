@@ -13,3 +13,14 @@ Options:
   - `from` -- number of block from with we start
   - `method` -- rest or rpc
   - `loop` -- request same block by hash over and over
+
+### watch blocks
+
+```bash
+node watch.js --bitcoind http://bitcoinrpc:password@127.0.0.1:8332 --method rest
+```
+
+Options:
+
+  - `bitcoind` -- url to bitcoind with user:pass
+  - `method` -- rest or rpc
